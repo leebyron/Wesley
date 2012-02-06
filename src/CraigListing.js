@@ -50,8 +50,9 @@ CraigListing.fromRSS = function (item) {
   return listing;
 };
 
-CraigListing.prototype.loadAdditionalInformation = function () {
-  // load the actual cl post
+CraigListing.prototype.loadAdditionalInformation = function (callback) {
+  // TODO: load the actual cl post, get EMAIL, ADDRESS, LAT/LON, WALKSCORE, IMAGES, TRANSIT
+  callback(null);
 };
 
 function tokenizeHTML(html) {

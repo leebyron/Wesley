@@ -1,4 +1,3 @@
-//var http = require('http');
 var libxmljs = require('libxmljs');
 var CraigListing = require('./CraigListing.js');
 var CraigRequest = require('./CraigRequest.js');
@@ -27,10 +26,18 @@ CraigSource.prototype.fetchQuery = function () {
     for (var ii in items) {
       try {
         var listing = CraigListing.fromRSS(items[ii]);
-        console.log(listing);
+        // TODO: test to ensure existing ID doesn't already exist
+        listing.loadAdditionalInformation(function (error) {
+          if (error) {
+            console.error(error);
+          } else {
+            console.log(listing);
+          }
+        });
       } catch (exception) {
         console.error(exception);
       }
+      break; // just testing one load for now
     }
   });
 };
