@@ -1,0 +1,7 @@
+{
+  "name" : "wesley",
+  "author" : "Lee Byron",
+  "dependencies" : {
+    "libxmljs" : ">= 0.5.3"
+  }
+}
