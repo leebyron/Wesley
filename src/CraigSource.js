@@ -24,20 +24,26 @@ CraigSource.prototype.fetchQuery = function () {
     var xmlDoc = libxmljs.parseXmlString(data);
     var items = xmlDoc.root().find('xmlns:item', 'http://purl.org/rss/1.0/');
     for (var ii in items) {
-      try {
+      //try {
         var listing = CraigListing.fromRSS(items[ii]);
+
+        if (!listing) {
+          // there was a problem, or the listing was blacklisted
+          continue;
+        }
+
         // TODO: test to ensure existing ID doesn't already exist
         listing.loadAdditionalInformation(function (error) {
           if (error) {
             console.error(error);
-          } else {
-            console.log(listing);
+            return;
           }
-        });
-      } catch (exception) {
-        console.error(exception);
-      }
-      break; // just testing one load for now
+          console.log(this);
+        }.bind(listing));
+      //} catch (exception) {
+      //  console.error(exception);
+      //}
+//      break; // just testing one load for now
     }
   });
 };
