@@ -25,10 +25,10 @@ exports.geocode = function (address, callback) {
 
     response.on('end', function () {
       var info = JSON.parse(data);
-      if (!info['Placemark']) {
+      if (!info.Placemark) {
         callback(new Error('Bad geo call: ' + JSON.stringify(info)), null);
       } else {
-        callback(null, info['Placemark'][0]);
+        callback(null, info.Placemark[0]);
       }
     });
   });

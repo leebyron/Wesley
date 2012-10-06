@@ -88,33 +88,34 @@ CraigListing.fromRSS = function (item) {
 };
 
 CraigListing.prototype.loadAdditionalInformation = function (callback) {
-  CraigRequest.get(this.url, function (error, data) {
+  var listing = this;
+  CraigRequest.get(listing.url, function (error, data) {
     if (!data) {
       callback(error);
       return;
     }
 
-    deriveEmail(this, data);
-    deriveImages(this, data);
+    deriveEmail(listing, data);
+    deriveImages(listing, data);
 
-    if (this.address) {
+    if (listing.address) {
       // geocode
-      Geo.geocode(this.address, function (error, place) {
+      Geo.geocode(listing.address, function (error, place) {
         if (!error) {
-          this.addressDetail.address = place.address;
-          this.addressDetail.accuracy = place.AddressDetails.Accuracy;
-          this.addressDetail.coordinate = place.Point.coordinates;
-          this.addressDetail.region = place.ExtendedData.LatLonBox;
+          listing.addressDetail.address = place.address;
+          listing.addressDetail.accuracy = place.AddressDetails.Accuracy;
+          listing.addressDetail.coordinate = place.Point.coordinates;
+          listing.addressDetail.region = place.ExtendedData.LatLonBox;
         }
         callback(error);
-      }.bind(this));
+      });
     } else {
       callback(null);
     }
 
     // WALKSCORE, IMAGES, TRANSIT
 
-  }.bind(this));
+  });
 };
 
 
@@ -126,7 +127,7 @@ function tokenizeHTML(html) {
 function getCLTags(html) {
   var tags = {};
   var result;
-  while (result = CLTAG_RX.exec(html)) {
+  while ((result = CLTAG_RX.exec(html))) {
     tags[result[1]] = result[2];
   }
   return tags;
@@ -157,7 +158,7 @@ function sanitizeNumber(numberish) {
   }
 
   num = NUMBER_MAP[numberish];
-  if (num != null) {
+  if (num !== null) {
     return num;
   }
 
@@ -265,7 +266,7 @@ function deriveEmail(listing, data) {
 
 function deriveImages(listing, data) {
   var match, image;
-  while (match = IMAGE_RX.exec(data)) {
+  while ((match = IMAGE_RX.exec(data))) {
     image = match[1];
     if (image.indexOf('craigslistadtracker') === -1) {
       listing.images.push(image);
@@ -275,16 +276,16 @@ function deriveImages(listing, data) {
 
 function deriveAddress(listing, data) {
   var tags = getCLTags(data);
-  var city = tags['city'] || 'San Francisco';
-  var region = tags['region'] || 'CA';
-  if (tags['xstreet0']) {
-    if (tags['xstreet1'] && !NUM_RX.test(tags['xstreet0'])) {
-      listing.address = tags['xstreet0'] + ' and ' + tags['xstreet1'] + ' ' + city + ' ' + region;
+  var city = tags.city || 'San Francisco';
+  var region = tags.region || 'CA';
+  if (tags.xstreet0) {
+    if (tags.xstreet1 && !NUM_RX.test(tags.xstreet0)) {
+      listing.address = tags.xstreet0 + ' and ' + tags.xstreet1 + ' ' + city + ' ' + region;
     } else {
       // TODO: find apt number
-      listing.address = tags['xstreet0'] + ' ' + city + ' ' + region;
-      if (tags['xstreet1']) {
-        listing.addressDetail.cross = tags['xstreet1'];
+      listing.address = tags.xstreet0 + ' ' + city + ' ' + region;
+      if (tags.xstreet1) {
+        listing.addressDetail.cross = tags.xstreet1;
       }
     }
   }
